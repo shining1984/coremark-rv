@@ -58,7 +58,7 @@ PORT_SRCS = $(PORT_DIR)/core_portme.c
 
 #For native compilation and execution
 LOAD = echo Loading done
-RUN = 
+RUN = /home/qemu/bin/qemu-riscv64 -L /opt/riscv/sysroot
 
 OEXT = .o
 EXE = .exe
