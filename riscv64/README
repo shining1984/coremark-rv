@@ -7,3 +7,17 @@ clang调用系统的ld，没有调用交叉工具链的ld，需要加上--target
 还需要加上 export PATH=/opt/riscv/bin:$PATH  ，这样可以让识别riscv64-unknown-linux-gnu-ld的目录。
 
 lgcc找不到，可以在编译参数里加上-L  /opt/riscv/lib/gcc/riscv64-unknown-linux-gnu/14.2.0。
+
+采用命令行进行编译和使用lld的时候，命令如下：
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot -L  /opt/riscv/lib/gcc/riscv64-unknown-linux-gnu/14.2.0 -I/home/coremark/riscv64 -I./ -fuse-ld=lld -Os -o coremark.exe core_list_join.c core_main.c core_matrix.c core_state.c core_util.c riscv64/core_portme.c -DPERFORMANCE_RUN=1
+
+分步骤，应用LTO编译coremark:
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot  -I/home/coremark/riscv64 -I./ -flto=thin -Os -c core_list_join.c
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot  -I/home/coremark/riscv64 -I./ -flto=thin -Os -c core_main.c
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot  -I/home/coremark/riscv64 -I./ -flto=thin -Os -c core_matrix.c
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot  -I/home/coremark/riscv64 -I./ -flto=thin -Os -c  core_state.c
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot  -I/home/coremark/riscv64 -I./ -flto=thin -Os -c  core_util.c
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot  -I/home/coremark/riscv64 -I./ -flto=thin -Os -c riscv64/core_portme.c
+
+/home/bolt/llvm-project/build/bin/clang --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot -L  /opt/riscv/lib/gcc/riscv64-unknown-linux-gnu/14.2.0 -I/home/coremark/riscv64 -I./ -fuse-ld=lld -flto=thin -Os -o coremark.exe core_list_join.o core_main.o core_matrix.o core_state.o core_util.o core_portme.o -DPERFORMANCE_RUN=1
+/home/qemu/bin/qemu-riscv64 -L /opt/riscv/sysroot coremark.exe
