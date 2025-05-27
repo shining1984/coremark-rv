@@ -21,10 +21,10 @@
 OUTFLAG= -o
 # Flag: CC
 #	Use this flag to define compiler to use
-CC = /home/llvm-project/build/bin/clang 
+CC = /home/bolt/llvm-project/build/bin/clang 
 # Flag: CFLAGS
 #	Use this flag to define compiler options. Note, you can add compiler options from the command line using XCFLAGS="other flags"
-PORT_CFLAGS = --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot -L  /opt/riscv/lib/gcc/riscv64-unknown-linux-gnu/14.2.0
+PORT_CFLAGS = --target=riscv64-unknown-linux-gnu -Os -march=rv64g --sysroot=/opt/riscv/sysroot -L  /opt/riscv/lib/gcc/riscv64-unknown-linux-gnu/14.2.0 -fuse-ld=lld
 FLAGS_STR = "$(PORT_CFLAGS) $(XCFLAGS) $(XLFLAGS) $(LFLAGS_END)"
 CFLAGS = $(PORT_CFLAGS) -I$(PORT_DIR) -I. -DFLAGS_STR=\"$(FLAGS_STR)\"
 # Flag: NO_LIBRT
@@ -68,7 +68,7 @@ EXE = .exe
 # In this case, you also need to define below how to create an object file, and how to link.
 ifdef SEPARATE_COMPILE
 
-LD		= gcc
+LD		= lld
 OBJOUT 	= -o
 LFLAGS 	=
 OFLAG 	= -o
